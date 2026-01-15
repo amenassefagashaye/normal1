@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>አሰፋ ቢንጎ - አስተዳደር</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Login Screen -->
+        <div id="loginScreen" class="login-screen">
+            <div class="login-box">
+                <div class="login-header amharic-text">
+                    <h2>አስተዳደር መግቢያ</h2>
+                    <p>እባክዎ የይለፍ ቃል ያስገቡ</p>
+                </div>
+                <div class="login-form">
+                    <div class="form-group">
+                        <input type="text" id="adminUsername" placeholder="የተጠቃሚ ስም" value="admin" readonly>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="adminPassword" placeholder="የይለፍ ቃል">
+                    </div>
+                    <button class="login-btn" onclick="adminLogin()">ግባ</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Dashboard -->
+        <div id="adminDashboard" class="admin-dashboard" style="display: none;">
+            <div class="admin-header">
+                <div class="admin-title">
+                    <h1 class="amharic-text">አሰፋ ቢንጎ - አስተዳደር</h1>
+                    <p id="serverTime">Server: Connected</p>
+                </div>
+                <div class="admin-controls">
+                    <button class="admin-btn btn-danger" onclick="logout()">ውጣ</button>
+                    <button class="admin-btn btn-refresh" onclick="refreshDashboard()">🔄</button>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <!-- Game Control Panel -->
+                <div class="dashboard-card game-control">
+                    <h3 class="amharic-text">የጨዋታ መቆጣጠሪያ</h3>
+                    <div class="control-section">
+                        <div class="control-group">
+                            <label class="amharic-text">የጨዋታ አይነት</label>
+                            <select id="adminGameType" class="admin-select">
+                                <option value="75ball">75-ቢንጎ</option>
+                                <option value="90ball">90-ቢንጎ</option>
+                                <option value="30ball">30-ቢንጎ</option>
+                                <option value="50ball">50-ቢንጎ</option>
+                                <option value="pattern">ንድፍ ቢንጎ</option>
+                                <option value="coverall">ሙሉ ቤት</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label class="amharic-text">ውርርድ መጠን</label>
+                            <select id="adminStake" class="admin-select">
+                                <option value="25">25 ብር</option>
+                                <option value="50">50 ብር</option>
+                                <option value="100">100 ብር</option>
+                                <option value="200">200 ብር</option>
+                                <option value="500">500 ብር</option>
+                                <option value="1000">1000 ብር</option>
+                                <option value="2000">2000 ብር</option>
+                                <option value="5000">5000 ብር</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label class="amharic-text">ከፍተኛ ተጫዋቾች</label>
+                            <input type="number" id="adminMaxPlayers" class="admin-input" value="90" min="2" max="200">
+                        </div>
+                        <div class="control-buttons">
+                            <button class="admin-btn btn-success" id="startGameBtn" onclick="startGame()">ጨዋታ ጀምር</button>
+                            <button class="admin-btn btn-danger" id="stopGameBtn" onclick="stopGame()" disabled>ጨዋታ አቁም</button>
+                            <button class="admin-btn btn-warning" id="resetGameBtn" onclick="resetGame()">እንደገና ጀምር</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Number Calling Panel -->
+                <div class="dashboard-card number-control">
+                    <h3 class="amharic-text">የቁጥር ጥሪ</h3>
+                    <div class="number-section">
+                        <div class="current-number-display">
+                            <div class="number-label amharic-text">የአሁኑ ቁጥር</div>
+                            <div class="number-value" id="currentNumberDisplay">-</div>
+                        </div>
+                        <div class="number-controls">
+                            <button class="number-btn btn-call" onclick="callNextNumber()">ቁጥር ጥራ</button>
+                            <button class="number-btn btn-auto" id="autoCallBtn" onclick="toggleAutoCall()">ራስ-ሰር ጥሪ</button>
+                            <button class="number-btn btn-undo" onclick="undoLastCall()">ተመለስ</button>
+                        </div>
+                        <div class="called-numbers">
+                            <h4 class="amharic-text">የተጠሩ ቁጥሮች</h4>
+                            <div class="called-list" id="adminCalledNumbers">
+                                <!-- Called numbers will appear here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Players Management -->
+                <div class="dashboard-card players-management">
+                    <h3 class="amharic-text">የተጫዋቾች አስተዳደር</h3>
+                    <div class="players-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">ጠቅላላ:</span>
+                            <span class="stat-value" id="totalPlayers">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">በመጫወት ላይ:</span>
+                            <span class="stat-value" id="activePlayers">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">ዝግጁ:</span>
+                            <span class="stat-value" id="readyPlayers">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">አሸናፊዎች:</span>
+                            <span class="stat-value" id="winnersCount">0</span>
+                        </div>
+                    </div>
+                    <div class="players-list-container">
+                        <div class="players-header">
+                            <input type="text" id="adminPlayerSearch" placeholder="ተጫዋች ፈልግ..." class="search-input">
+                            <button class="refresh-btn" onclick="refreshPlayers()">🔄</button>
+                        </div>
+                        <div class="players-table-container">
+                            <table class="players-table">
+                                <thead>
+                                    <tr>
+                                        <th class="amharic-text">ተ.ቁ.</th>
+                                        <th class="amharic-text">ስም</th>
+                                        <th class="amharic-text">ስልክ</th>
+                                        <th class="amharic-text">ውርርድ</th>
+                                        <th class="amharic-text">ሁኔታ</th>
+                                        <th class="amharic-text">ተግባር</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminPlayersList">
+                                    <!-- Players will be added here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game Statistics -->
+                <div class="dashboard-card game-stats">
+                    <h3 class="amharic-text">የጨዋታ ስታቲስቲክስ</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">💰</div>
+                            <div class="stat-info">
+                                <div class="stat-title amharic-text">ጠቅላላ ውርርድ</div>
+                                <div class="stat-value" id="totalStakes">0 ብር</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🏆</div>
+                            <div class="stat-info">
+                                <div class="stat-title amharic-text">ጠቅላላ ሽልማት</div>
+                                <div class="stat-value" id="totalPrizes">0 ብር</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">⏱️</div>
+                            <div class="stat-info">
+                                <div class="stat-title amharic-text">የጨዋታ ጊዜ</div>
+                                <div class="stat-value" id="gameDuration">00:00</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🔢</div>
+                            <div class="stat-info">
+                                <div class="stat-title amharic-text">የተጠሩ ቁጥሮች</div>
+                                <div class="stat-value" id="totalCalled">0</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="winners-list">
+                        <h4 class="amharic-text">የቅርብ ጊዜ አሸናፊዎች</h4>
+                        <div class="winners-container" id="recentWinners">
+                            <!-- Recent winners will appear here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Controls -->
+                <div class="dashboard-card system-controls">
+                    <h3 class="amharic-text">የስርዓት መቆጣጠሪያዎች</h3>
+                    <div class="system-section">
+                        <div class="control-group">
+                            <label class="amharic-text">የጨዋታ ፍጥነት</label>
+                            <div class="slider-container">
+                                <input type="range" id="gameSpeed" min="3" max="15" value="7" class="speed-slider">
+                                <span id="speedValue">7 ሰከንድ</span>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="amharic-text">የማሳወቂያ</label>
+                            <textarea id="adminAnnouncement" class="announcement-input" placeholder="ማሳወቂያ ይጻፉ..." rows="3"></textarea>
+                            <button class="admin-btn btn-info" onclick="sendAnnouncement()">ላክ</button>
+                        </div>
+                        <div class="control-group">
+                            <label class="amharic-text">የጨዋታ ሕግ</label>
+                            <select id="gameRules" class="admin-select">
+                                <option value="standard">መደበኛ</option>
+                                <option value="quick">ፈጣን</option>
+                                <option value="pattern">ንድፍ</option>
+                                <option value="coverall">ሙሉ ቤት</option>
+                            </select>
+                        </div>
+                        <div class="system-buttons">
+                            <button class="admin-btn btn-warning" onclick="backupGame()">ተጠቃሚ መረጃ አስቀምጥ</button>
+                            <button class="admin-btn btn-danger" onclick="clearAllData()">ሁሉንም መረጃዎች አጥፋ</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Chat Monitor -->
+            <div class="chat-monitor">
+                <h3 class="amharic-text">የቀጥታ ውይይት</h3>
+                <div class="chat-monitor-container">
+                    <div class="chat-messages-admin" id="adminChatMessages">
+                        <!-- Chat messages will appear here -->
+                    </div>
+                    <div class="chat-controls">
+                        <input type="text" id="adminChatInput" placeholder="መልእክት ይጻፉ..." class="chat-input-admin">
+                        <button class="chat-send-btn" onclick="sendAdminMessage()">➤</button>
+                        <button class="chat-clear-btn" onclick="clearChat()">🗑️</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Elements -->
+    <audio id="callAudio" src="assets/call.mp3" preload="auto"></audio>
+    <audio id="winAudio" src="assets/win.mp3" preload="auto"></audio>
+
+    <!-- Admin JavaScript -->
+    <script src="client.js"></script>
+    <script>
+        // Admin-specific functions
+        let adminWs = null;
+        let adminAuthenticated = false;
+
+        function adminLogin() {
+            const password = document.getElementById('adminPassword').value;
+            
+            if (password === 'asse2123') {
+                adminAuthenticated = true;
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('adminDashboard').style.display = 'block';
+                connectAdminWebSocket();
+            } else {
+                alert('የይለፍ ቃል ትክክል አይደለም!');
+            }
+        }
+
+        function connectAdminWebSocket() {
+            const wsUrl = window.location.hostname === 'localhost' 
+                ? 'ws://localhost:8080/ws/admin'
+                : `wss://${window.location.hostname}/ws/admin`;
+            
+            adminWs = new WebSocket(wsUrl);
+
+            adminWs.onopen = function() {
+                console.log('Admin WebSocket connected');
+                // Send authentication
+                adminWs.send(JSON.stringify({
+                    type: 'admin_auth',
+                    password: 'asse2123'
+                }));
+            };
+
+            adminWs.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                handleAdminMessage(data);
+            };
+
+            adminWs.onclose = function() {
+                console.log('Admin WebSocket disconnected');
+                setTimeout(connectAdminWebSocket, 3000);
+            };
+
+            adminWs.onerror = function(error) {
+                console.error('Admin WebSocket error:', error);
+            };
+        }
+
+        function handleAdminMessage(data) {
+            switch(data.type) {
+                case 'admin_auth_success':
+                    console.log('Admin authenticated successfully');
+                    break;
+                case 'game_state':
+                    updateGameState(data.state);
+                    break;
+                case 'player_list':
+                    updatePlayerList(data.players);
+                    break;
+                case 'game_stats':
+                    updateGameStats(data.stats);
+                    break;
+                case 'chat_message':
+                    addChatMessage(data.message);
+                    break;
+                case 'winner':
+                    showWinnerNotification(data);
+                    break;
+                case 'number_called':
+                    updateCalledNumbers(data);
+                    break;
+            }
+        }
+
+        function startGame() {
+            const gameType = document.getElementById('adminGameType').value;
+            const stake = document.getElementById('adminStake').value;
+            const maxPlayers = document.getElementById('adminMaxPlayers').value;
+
+            adminWs.send(JSON.stringify({
+                type: 'start_game',
+                gameType: gameType,
+                stake: parseInt(stake),
+                maxPlayers: parseInt(maxPlayers)
+            }));
+        }
+
+        function stopGame() {
+            adminWs.send(JSON.stringify({
+                type: 'stop_game'
+            }));
+        }
+
+        function callNextNumber() {
+            adminWs.send(JSON.stringify({
+                type: 'call_number'
+            }));
+        }
+
+        function toggleAutoCall() {
+            const btn = document.getElementById('autoCallBtn');
+            const autoCalling = btn.classList.contains('active');
+            
+            adminWs.send(JSON.stringify({
+                type: 'toggle_auto_call',
+                autoCall: !autoCalling
+            }));
+        }
+
+        function sendAnnouncement() {
+            const message = document.getElementById('adminAnnouncement').value;
+            if (message.trim()) {
+                adminWs.send(JSON.stringify({
+                    type: 'announcement',
+                    message: message
+                }));
+                document.getElementById('adminAnnouncement').value = '';
+            }
+        }
+
+        function updateGameState(state) {
+            document.getElementById('startGameBtn').disabled = state.status === 'running';
+            document.getElementById('stopGameBtn').disabled = state.status !== 'running';
+            
+            if (state.currentNumber) {
+                document.getElementById('currentNumberDisplay').textContent = state.currentNumber;
+            }
+        }
+
+        function updatePlayerList(players) {
+            const tbody = document.getElementById('adminPlayersList');
+            tbody.innerHTML = '';
+            
+            players.forEach((player, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${player.name}</td>
+                    <td>${player.phone}</td>
+                    <td>${player.stake} ብር</td>
+                    <td><span class="status-badge ${player.status}">${player.status}</span></td>
+                    <td>
+                        <button class="action-btn" onclick="kickPlayer('${player.id}')">🏃</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            document.getElementById('totalPlayers').textContent = players.length;
+            document.getElementById('activePlayers').textContent = players.filter(p => p.status === 'playing').length;
+            document.getElementById('readyPlayers').textContent = players.filter(p => p.status === 'ready').length;
+        }
+
+        function kickPlayer(playerId) {
+            if (confirm('ይህን ተጫዋች ለማስወገድ እርግጠኛ ነዎት?')) {
+                adminWs.send(JSON.stringify({
+                    type: 'kick_player',
+                    playerId: playerId
+                }));
+            }
+        }
+
+        function logout() {
+            adminAuthenticated = false;
+            document.getElementById('loginScreen').style.display = 'block';
+            document.getElementById('adminDashboard').style.display = 'none';
+            if (adminWs) {
+                adminWs.close();
+            }
+        }
+
+        // Initialize on load
+        window.addEventListener('load', function() {
+            document.getElementById('adminPassword').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    adminLogin();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

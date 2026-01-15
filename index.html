@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>አሰፋ ዲጂታል ቢንጎ ጨዋታ - Multiplayer</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="border-container">
+        <div class="main-container">
+            <div class="page-border green"></div>
+            <div class="page-border yellow"></div>
+            <div class="page-border red"></div>
+
+            <!-- Connection Status -->
+            <div id="connectionStatus" class="connection-status">
+                <span id="statusText">Connecting...</span>
+                <span id="onlineCount">0 online</span>
+            </div>
+
+            <!-- Page 0: Welcome -->
+            <div class="page-container active" id="page0">
+                <button class="help-circle-btn" onclick="showPage(5)">?</button>
+                <div class="page-content">
+                    <div class="welcome-content">
+                        <div class="game-title amharic-text">አሰፋ ዲጂታል ቢንጎ ጨዋታ</div>
+                        <div class="game-subtitle">Multiplayer Edition</div>
+                        
+                        <div class="connection-info">
+                            <div class="info-item">
+                                <span class="info-label">Server:</span>
+                                <span id="serverStatus" class="status-connected">● Connected</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Players:</span>
+                                <span id="playersCount">0</span> online
+                            </div>
+                        </div>
+
+                        <button class="start-btn-circle" onclick="showPage(1)">
+                            <div style="font-size: 24px;">🎮</div>
+                        </button>
+                        
+                        <div class="action-buttons">
+                            <button class="action-btn" onclick="showPage(5)">
+                                <span>📚</span>
+                                <span>እርዳታ</span>
+                            </button>
+                            <button class="action-btn" onclick="window.open('admin.html', '_blank')">
+                                <span>🔐</span>
+                                <span>አስተዳደር</span>
+                            </button>
+                        </div>
+
+                        <div class="developer-text amharic-text">አሰፋ ጋሻዬ ብርሃንነህ</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page 1: Board Selection -->
+            <div class="page-container" id="page1">
+                <div class="page-content">
+                    <div class="page-header amharic-text">የቦርድ ዓይነት ይምረጡ</div>
+                    <div class="board-selection-container">
+                        <div class="board-type-grid" id="boardTypeGrid"></div>
+                    </div>
+                </div>
+                <div class="fixed-controls">
+                    <button class="control-btn btn-secondary" onclick="showPage(0)">ተመለስ</button>
+                    <button class="control-btn btn-success" id="nextBtn">ቀጥል</button>
+                </div>
+            </div>
+
+            <!-- Page 2: Registration -->
+            <div class="page-container" id="page2">
+                <div class="page-content">
+                    <div class="registration-top-bar">
+                        <button class="top-bar-btn win-btn" onclick="showPotentialWin()">🏆</button>
+                        <div class="registration-title amharic-text">ምዝገባ</div>
+                        <button class="top-bar-btn members-btn" onclick="showMembers()">👥</button>
+                    </div>
+                    
+                    <div class="registration-form">
+                        <div class="form-scroll">
+                            <div class="form-group">
+                                <label for="playerName" class="amharic-text">ስም</label>
+                                <input type="text" id="playerName" class="form-control" placeholder="ሙሉ ስም">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="playerPhone" class="amharic-text">ስልክ</label>
+                                <input type="tel" id="playerPhone" class="form-control" placeholder="0918203416">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="playerStake" class="amharic-text">ውርርድ መጠን</label>
+                                <select id="playerStake" class="form-control">
+                                    <option value="25">25 ብር</option>
+                                    <option value="50">50 ብር</option>
+                                    <option value="100">100 ብር</option>
+                                    <option value="200">200 ብር</option>
+                                    <option value="500">500 ብር</option>
+                                    <option value="1000">1000 ብር</option>
+                                    <option value="2000">2000 ብር</option>
+                                    <option value="5000">5000 ብር</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="boardSelect" class="amharic-text">የቦርድ ቁጥር</label>
+                                <select id="boardSelect" class="form-control">
+                                    <option value="">1-100</option>
+                                </select>
+                            </div>
+
+                            <div class="payment-section">
+                                <div class="payment-info">
+                                    <div class="payment-item">
+                                        <span>ውርርድ:</span>
+                                        <span id="stakeAmount">25 ብር</span>
+                                    </div>
+                                    <div class="payment-item">
+                                        <span>ሊያሸንፉት:</span>
+                                        <span id="potentialWin">0 ብር</span>
+                                    </div>
+                                </div>
+                                <button class="payment-btn" onclick="joinGame()">ጨዋታ ይቀላቀሉ</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="fixed-controls">
+                    <button class="control-btn btn-secondary" onclick="showPage(1)">ተመለስ</button>
+                    <button class="control-btn btn-success" onclick="joinGame()">ጀምር</button>
+                </div>
+            </div>
+
+            <!-- Page 3: Lobby -->
+            <div class="page-container" id="page3">
+                <div class="page-content">
+                    <div class="page-header amharic-text">
+                        <span>የጨዋታ ምደባ</span>
+                        <span id="gameStatus" class="game-status waiting">በመጠባበቅ ላይ</span>
+                    </div>
+                    
+                    <div class="lobby-container">
+                        <div class="game-info">
+                            <div class="info-card">
+                                <div class="info-label">የቦርድ አይነት</div>
+                                <div class="info-value" id="lobbyGameType">75-ቢንጎ</div>
+                            </div>
+                            <div class="info-card">
+                                <div class="info-label">የተጫዋቾች</div>
+                                <div class="info-value">
+                                    <span id="currentPlayers">0</span>/<span id="maxPlayers">90</span>
+                                </div>
+                            </div>
+                            <div class="info-card">
+                                <div class="info-label">ውርርድ</div>
+                                <div class="info-value" id="lobbyStake">25 ብር</div>
+                            </div>
+                            <div class="info-card">
+                                <div class="info-label">ሽልማት</div>
+                                <div class="info-value" id="lobbyPrize">0 ብር</div>
+                            </div>
+                        </div>
+
+                        <div class="players-list-container">
+                            <div class="players-header">
+                                <h3 class="amharic-text">ተጫዋቾች</h3>
+                                <div class="search-box">
+                                    <input type="text" id="playerSearch" placeholder="ፈልግ...">
+                                </div>
+                            </div>
+                            <div class="players-list" id="playersList">
+                                <!-- Players will be added here -->
+                            </div>
+                        </div>
+
+                        <div class="chat-container">
+                            <div class="chat-header">
+                                <h3 class="amharic-text">ውይይት</h3>
+                            </div>
+                            <div class="chat-messages" id="chatMessages">
+                                <!-- Chat messages will be added here -->
+                            </div>
+                            <div class="chat-input">
+                                <input type="text" id="chatInput" placeholder="መልእክት ይጻፉ..." maxlength="200">
+                                <button onclick="sendChatMessage()">➤</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="fixed-controls">
+                    <button class="control-btn btn-danger" onclick="leaveGame()">አቁም</button>
+                    <button class="control-btn btn-info" id="readyBtn" onclick="toggleReady()">ዝግጁ ነኝ</button>
+                </div>
+            </div>
+
+            <!-- Page 4: Game Board -->
+            <div class="page-container" id="page4">
+                <div class="game-header">
+                    <div class="game-info-bar">
+                        <span id="playerDisplayName">Guest</span>
+                        <span class="game-type" id="displayGameType">75-ቢንጎ</span>
+                        <span class="stake-display" id="displayStake">25 ብር</span>
+                    </div>
+                    <div class="game-controls-bar">
+                        <button class="mini-btn" onclick="toggleAudio()">🔊</button>
+                        <button class="mini-btn" onclick="showPage(3)">👥</button>
+                        <button class="mini-btn" onclick="showHelp()">❓</button>
+                    </div>
+                </div>
+                
+                <div class="game-board-container">
+                    <div id="gameBoard"></div>
+                    
+                    <div class="called-numbers-display">
+                        <div class="called-numbers-title amharic-text">የተጠሩ ቁጥሮች</div>
+                        <div class="called-numbers-grid" id="calledNumbersGrid">
+                            <!-- Called numbers will be added here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="game-stats-bar">
+                    <div class="stat-item">
+                        <span class="stat-label">ቁጥሮች:</span>
+                        <span id="calledCount">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">ምልክት የተደረገ:</span>
+                        <span id="markedCount">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">ሚዛን:</span>
+                        <span id="balanceDisplay">0 ብር</span>
+                    </div>
+                </div>
+
+                <div class="game-controls">
+                    <button class="control-btn btn-secondary" onclick="leaveGameBoard()">ወጣ</button>
+                    <button class="control-btn btn-success" id="bingoBtn" disabled onclick="claimBingo()">
+                        <span>ቢንጎ!</span>
+                    </button>
+                    <button class="control-btn btn-info" onclick="autoMarkToggle()">
+                        <span id="autoMarkText">ራስ-ሰር ምልክት</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Page 5: Help -->
+            <div class="page-container" id="page5">
+                <div class="page-content">
+                    <div class="page-header amharic-text">እርዳታ / Help</div>
+                    <div class="help-content">
+                        <!-- Help content remains the same as original -->
+                    </div>
+                </div>
+                <div class="fixed-controls">
+                    <button class="control-btn btn-success" onclick="showPage(0)">ተመለስ</button>
+                </div>
+            </div>
+
+            <!-- Winner Notification -->
+            <div class="winner-notification" id="winnerNotification">
+                <div class="winner-content">
+                    <div class="winner-icon">🏆</div>
+                    <div class="winner-title amharic-text">ቢንጎ!</div>
+                    <div class="winner-name" id="winnerName"></div>
+                    <div class="winner-pattern" id="winPattern"></div>
+                    <div class="winner-amount" id="winAmount"></div>
+                    <div class="winner-message">በተሳካ ሁኔታ አሸነፈ!</div>
+                    <button class="control-btn btn-success" onclick="continueWatching()">ቀጥል</button>
+                </div>
+            </div>
+
+            <!-- Global Notification -->
+            <div class="global-notification" id="globalNotification">
+                <div class="notification-content" id="notificationContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WebSocket connection script -->
+    <script src="client.js"></script>
+</body>
+</html>

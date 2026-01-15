@@ -1,0 +1,922 @@
+/* Mobile First Design - Multiplayer Edition */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Times New Roman', 'Noto Sans Ethiopic', sans-serif;
+    background: linear-gradient(135deg, #0d47a1 0%, #1a237e 100%);
+    color: white;
+    touch-action: manipulation;
+}
+
+/* Connection Status */
+.connection-status {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #28a745;
+    border-radius: 10px;
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10000;
+    font-size: 12px;
+}
+
+#statusText.connected {
+    color: #28a745;
+}
+
+#statusText.disconnected {
+    color: #dc3545;
+}
+
+#onlineCount {
+    background: rgba(255, 215, 0, 0.2);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+/* Game Status */
+.game-status {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 15px;
+    font-size: 12px;
+    margin-left: 10px;
+}
+
+.game-status.waiting {
+    background: #ffd700;
+    color: #0d47a1;
+}
+
+.game-status.running {
+    background: #28a745;
+    color: white;
+    animation: pulse 1s infinite;
+}
+
+.game-status.finished {
+    background: #dc3545;
+    color: white;
+}
+
+/* Lobby Styles */
+.lobby-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: calc(100vh - 150px);
+    overflow: hidden;
+}
+
+.game-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 8px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    border: 2px solid #ffd700;
+}
+
+.info-card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.info-label {
+    font-size: 12px;
+    color: #ffd700;
+    margin-bottom: 5px;
+}
+
+.info-value {
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+}
+
+.players-list-container {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    border: 2px solid #28a745;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.players-header {
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.players-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.player-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    margin-bottom: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.player-name {
+    font-weight: bold;
+    color: #ffd700;
+}
+
+.player-stake {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.player-status {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+.player-status.ready {
+    background: #28a745;
+    color: white;
+}
+
+.player-status.playing {
+    background: #17a2b8;
+    color: white;
+}
+
+/* Chat Container */
+.chat-container {
+    height: 200px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    border: 2px solid #17a2b8;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.chat-message {
+    margin-bottom: 8px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    font-size: 12px;
+}
+
+.chat-message .sender {
+    color: #ffd700;
+    font-weight: bold;
+}
+
+.chat-input {
+    display: flex;
+    padding: 10px;
+    gap: 5px;
+}
+
+.chat-input input {
+    flex: 1;
+    padding: 8px;
+    border: 2px solid #000;
+    border-radius: 8px;
+    background: white;
+    color: #333;
+}
+
+.chat-input button {
+    width: 40px;
+    border-radius: 8px;
+    border: 2px solid #000;
+    background: #17a2b8;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Called Numbers Display */
+.called-numbers-display {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid #ffd700;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.called-numbers-title {
+    text-align: center;
+    color: #ffd700;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.called-numbers-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 3px;
+}
+
+.called-number-item {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    padding: 5px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.called-number-item.new {
+    background: #28a745;
+    animation: popIn 0.3s;
+}
+
+/* Game Header */
+.game-header {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    height: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid #ffd700;
+    border-radius: 8px;
+    padding: 0 10px;
+    z-index: 100;
+}
+
+.game-info-bar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+#playerDisplayName {
+    font-weight: bold;
+    color: #ffd700;
+}
+
+.game-type {
+    background: #17a2b8;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+}
+
+.stake-display {
+    background: #28a745;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+}
+
+.game-controls-bar {
+    display: flex;
+    gap: 5px;
+}
+
+.mini-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid #000;
+    background: #6c757d;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Game Stats Bar */
+.game-stats-bar {
+    position: absolute;
+    bottom: 70px;
+    left: 10px;
+    right: 10px;
+    display: flex;
+    justify-content: space-around;
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid #28a745;
+    border-radius: 8px;
+    padding: 8px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-label {
+    display: block;
+    font-size: 10px;
+    color: #ffd700;
+}
+
+/* Winner Notification */
+.winner-notification {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.95);
+    color: white;
+    padding: 30px;
+    border-radius: 20px;
+    border: 5px solid #ffd700;
+    z-index: 10000;
+    text-align: center;
+    width: 90%;
+    max-width: 400px;
+    display: none;
+}
+
+.winner-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.winner-icon {
+    font-size: 50px;
+    animation: bounce 1s infinite;
+}
+
+.winner-title {
+    font-size: 32px;
+    color: #ffd700;
+    font-weight: bold;
+}
+
+.winner-name {
+    font-size: 24px;
+    font-weight: bold;
+    color: #28a745;
+}
+
+.winner-pattern {
+    font-size: 18px;
+    color: #17a2b8;
+}
+
+.winner-amount {
+    font-size: 28px;
+    color: #ffd700;
+    font-weight: bold;
+}
+
+.winner-message {
+    font-size: 14px;
+    color: #ccc;
+}
+
+/* Global Notification */
+.global-notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 10px;
+    border: 2px solid #ffd700;
+    z-index: 10000;
+    max-width: 90%;
+    display: none;
+    animation: slideDown 0.3s;
+}
+
+/* Admin Styles */
+.admin-container {
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.login-screen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    background: linear-gradient(135deg, #0d47a1 0%, #1a237e 100%);
+}
+
+.login-box {
+    background: rgba(0, 0, 0, 0.8);
+    padding: 30px;
+    border-radius: 20px;
+    border: 3px solid #ffd700;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.login-header h2 {
+    color: #ffd700;
+    margin-bottom: 10px;
+}
+
+.login-form {
+    margin-top: 20px;
+}
+
+.login-form input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 2px solid #000;
+    border-radius: 8px;
+    font-size: 16px;
+    background: white;
+    color: #333;
+}
+
+.login-btn {
+    width: 100%;
+    padding: 12px;
+    background: #28a745;
+    color: white;
+    border: 2px solid #000;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.admin-dashboard {
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    background: #0d47a1;
+    color: white;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border-bottom: 2px solid #ffd700;
+}
+
+.admin-title h1 {
+    color: #ffd700;
+    font-size: 20px;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 15px;
+    padding: 15px;
+    height: calc(100vh - 150px);
+    overflow-y: auto;
+}
+
+.dashboard-card {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 15px;
+    border: 2px solid #28a745;
+    padding: 15px;
+}
+
+.dashboard-card h3 {
+    color: #ffd700;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.control-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.admin-select, .admin-input {
+    padding: 8px;
+    border: 2px solid #000;
+    border-radius: 8px;
+    background: white;
+    color: #333;
+    font-weight: bold;
+}
+
+.control-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.admin-btn {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid #000;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+}
+
+.btn-success {
+    background: #28a745;
+    color: white;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-warning {
+    background: #ffd700;
+    color: #0d47a1;
+}
+
+.btn-info {
+    background: #17a2b8;
+    color: white;
+}
+
+.number-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.current-number-display {
+    text-align: center;
+}
+
+.number-label {
+    color: #ffd700;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.number-value {
+    font-size: 48px;
+    font-weight: bold;
+    color: #28a745;
+    animation: pulse 2s infinite;
+}
+
+.number-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.number-btn {
+    padding: 10px 15px;
+    border: 2px solid #000;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-call {
+    background: #28a745;
+    color: white;
+}
+
+.btn-auto {
+    background: #17a2b8;
+    color: white;
+}
+
+.btn-auto.active {
+    background: #dc3545;
+}
+
+.btn-undo {
+    background: #ffd700;
+    color: #0d47a1;
+}
+
+.called-numbers {
+    width: 100%;
+}
+
+.called-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    max-height: 100px;
+    overflow-y: auto;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+}
+
+.called-number-tag {
+    background: rgba(255, 215, 0, 0.2);
+    padding: 5px 8px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.players-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.players-table-container {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.players-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.players-table th {
+    background: #28a745;
+    color: white;
+    padding: 8px;
+    text-align: left;
+    position: sticky;
+    top: 0;
+    border: 1px solid #ffd700;
+}
+
+.players-table td {
+    padding: 6px;
+    border: 1px solid #ffd700;
+}
+
+.status-badge {
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+}
+
+.status-badge.ready {
+    background: #28a745;
+    color: white;
+}
+
+.status-badge.playing {
+    background: #17a2b8;
+    color: white;
+}
+
+.status-badge.inactive {
+    background: #6c757d;
+    color: white;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.stat-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+}
+
+.stat-icon {
+    font-size: 24px;
+}
+
+.stat-title {
+    font-size: 10px;
+    color: #ffd700;
+}
+
+.stat-value {
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+}
+
+.winners-list {
+    margin-top: 15px;
+}
+
+.winners-container {
+    max-height: 150px;
+    overflow-y: auto;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+}
+
+.winner-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.system-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.slider-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.speed-slider {
+    flex: 1;
+}
+
+.announcement-input {
+    width: 100%;
+    padding: 8px;
+    border: 2px solid #000;
+    border-radius: 8px;
+    background: white;
+    color: #333;
+    resize: vertical;
+}
+
+.system-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.chat-monitor {
+    margin: 15px;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 15px;
+    border: 2px solid #17a2b8;
+}
+
+.chat-monitor-container {
+    display: flex;
+    flex-direction: column;
+    height: 200px;
+}
+
+.chat-messages-admin {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.chat-controls {
+    display: flex;
+    gap: 5px;
+}
+
+.chat-input-admin {
+    flex: 1;
+    padding: 8px;
+    border: 2px solid #000;
+    border-radius: 8px;
+    background: white;
+    color: #333;
+}
+
+.chat-send-btn, .chat-clear-btn {
+    padding: 8px 15px;
+    border: 2px solid #000;
+    border-radius: 8px;
+    background: #17a2b8;
+    color: white;
+    cursor: pointer;
+}
+
+/* Animations */
+@keyframes popIn {
+    0% { transform: scale(0); }
+    70% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -20px);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .game-info {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .players-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .number-controls {
+        flex-direction: column;
+    }
+    
+    .control-buttons {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-header {
+        flex-direction: column;
+        height: auto;
+        padding: 5px;
+        gap: 5px;
+    }
+    
+    .game-info-bar {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .lobby-container {
+        height: calc(100vh - 180px);
+    }
+    
+    .chat-container {
+        height: 150px;
+    }
+}
+
+/* Keep all original styles from previous CSS and add these new ones */
+/* All previous CSS styles from the original code should be included here */
+/* I've added them in the correct order to maintain priority */
